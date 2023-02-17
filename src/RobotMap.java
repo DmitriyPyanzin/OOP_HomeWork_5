@@ -103,10 +103,6 @@ public class RobotMap {
 
         }
 
-//        public String toDirection() {
-//            return "" + direction;
-//        }
-
         public MapPoint getPoint() {
             return point;
 
@@ -114,7 +110,7 @@ public class RobotMap {
 
         @Override
         public String toString() {
-            return "Robot-" + id + ", координаты-" + point + ", направление-" + direction;
+            return "Robot " + id + ", координаты " + point + ", направление " + direction;
 
         }
     }

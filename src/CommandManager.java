@@ -15,7 +15,7 @@ public class CommandManager {
         commands.put("a", this::addRobot);
         commands.put("l", this::listRobots);
         commands.put("m", this::moveRobot);
-
+        commands.put("cd", this::changeDirectionRobot);
     }
 
     public String handleCommand(String command) throws CommandNotFoundException, CommandExecutionException {
@@ -32,9 +32,10 @@ public class CommandManager {
     }
 
     private String addRobot(String[] args) throws CommandExecutionException {
-        if (args.length != 2) {
-            throw new CommandExecutionException("Недостаточно аргументов");
-        }
+        if (args.length < 2)
+            throw new CommandExecutionException("Мало аргументов");
+        if (args.length > 2)
+            throw new CommandExecutionException("Слишком много аргументов");
 
         int x = Integer.parseInt(args[0]);
         int y = Integer.parseInt(args[1]);
@@ -49,6 +50,8 @@ public class CommandManager {
     }
 
     private String listRobots(String[] args) throws CommandExecutionException {
+        if (args.length != 0)
+            throw new CommandExecutionException("Слишком много аргументов");
         if (map.getRobots().size() == 0)
             throw new CommandExecutionException("Не создано не одного робота");
 
@@ -59,18 +62,25 @@ public class CommandManager {
         return str + "\n";
     }
 
-    private String printHelp(String[] args) {
+    private String printHelp(String[] args) throws CommandExecutionException{
+        if (args.length != 0)
+            throw new CommandExecutionException("Слишком много аргументов");
+
         return """
                 
-                h                  -> распечатать список допустимых команд (help)
-                a 1 2              -> создать робота на позиции (1, 2) (add)
-                l                  -> распечатать всех роботов (list)
-                m index [t] [5]    -> перемещаем робота на заданное количество единиц и направление (move)
-                q                  -> завершить программу (quit)
+                h                     -> распечатать список допустимых команд (help)
+                a 1 2                 -> создать робота на позиции (1, 2) (add)
+                l                     -> распечатать всех роботов (list)
+                m index [num]         -> перемещаем робота на заданное количество единиц (move)
+                cd index [t, b, r, l] -> развернуть робота в нужном направлении (change direction)
+                q                     -> завершить программу (quit)
                 """;
     }
 
-    private String quit(String[] args) {
+    private String quit(String[] args) throws CommandExecutionException {
+        if (args.length != 0)
+            throw new CommandExecutionException("Слишком много аргументов");
+
         System.exit(0);
         return null;
     }
@@ -81,13 +91,43 @@ public class CommandManager {
     }
 
     private String moveRobot(String[] args) throws CommandExecutionException {
-        if (args.length > 3 || args.length < 2)
+        if (args.length == 0)
             throw new CommandExecutionException("Недостаточно аргументов");
-
+        if (args.length > 2)
+            throw new CommandExecutionException("Слишком много аргументов");
         if (map.getRobots().size() == 0)
             throw new CommandExecutionException("Не создано не одного робота");
 
         int index = Integer.parseInt(args[0]) - 1;
+        RobotMap.Robot robot = map.getRobots().get(index);
+
+        if (args.length == 1) {
+            try {
+                robot.move();
+            } catch (RobotMoveException e) {
+                System.err.println(e.getMessage());
+            }
+        } else {
+            int step = Integer.parseInt(args[1]);
+            try {
+                robot.move(step);
+            } catch (RobotMoveException e) {
+                System.err.println(e.getMessage());
+            }
+        } return "Теперь другие координаты у " + robot + "\n";
+    }
+
+    private String changeDirectionRobot(String[] args) throws CommandExecutionException {
+        if (args.length == 0)
+            throw new CommandExecutionException("Недостаточно аргументов");
+        if (args.length > 2)
+            throw new CommandExecutionException("Слишком много аргументов");
+        if (map.getRobots().size() == 0)
+            throw new CommandExecutionException("Не создано не одного робота");
+
+        int index = Integer.parseInt(args[0]) - 1;
+        RobotMap.Robot robot = map.getRobots().get(index);
+
         String dir = "";
         switch (String.valueOf(args[1])) {
             case "t" -> dir = "TOP";
@@ -95,23 +135,9 @@ public class CommandManager {
             case "r" -> dir = "RIGHT";
             case "l" -> dir = "LEFT";
         }
-
         Direction direction = Direction.valueOf(dir);
-        RobotMap.Robot robot = map.getRobots().get(index);
         robot.changeDirection(direction);
-        if (args.length == 2) {
-            try {
-                robot.move();
-            } catch (RobotMoveException e) {
-                System.err.println(e.getMessage());
-            }
-        } else {
-            int step = Integer.parseInt(args[2]);
-            try {
-                robot.move(step);
-            } catch (RobotMoveException e) {
-                System.err.println(e.getMessage());
-            }
-        } return "Теперь другие координаты у " + robot;
+
+        return "Изменение направления у " + robot + "\n";
     }
 }
