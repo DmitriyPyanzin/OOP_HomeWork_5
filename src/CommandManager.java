@@ -14,7 +14,7 @@ public class CommandManager {
         commands.put("q", this::quit);
         commands.put("a", this::addRobot);
         commands.put("l", this::listRobots);
-        commands.put("cd", this::moveRobot);
+        commands.put("m", this::moveRobot);
 
         // FIXME: 17.02.2023
     }
@@ -88,7 +88,15 @@ public class CommandManager {
             throw new CommandExecutionException("Не создано не одного робота");
 
         int index = Integer.parseInt(args[0]) - 1;
-        Direction direction = Direction.valueOf(args[1]);
+        String dir = "";
+        switch (String.valueOf(args[1])) {
+            case "t" -> dir = "TOP";
+            case "b" -> dir = "BOTTOM";
+            case "r" -> dir = "RIGHT";
+            case "l" -> dir = "LEFT";
+        }
+
+        Direction direction = Direction.valueOf(dir);
         RobotMap.Robot robot = map.getRobots().get(index);
         robot.changeDirection(direction);
         if (args.length == 2) {
