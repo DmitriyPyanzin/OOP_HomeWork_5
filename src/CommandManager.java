@@ -1,7 +1,6 @@
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class CommandManager {
 
@@ -15,7 +14,7 @@ public class CommandManager {
         commands.put("q", this::quit);
         commands.put("a", this::addRobot);
         commands.put("l", this::listRobots);
-        commands.put("cd", this::changeDirectionRobot);
+        commands.put("cd", this::moveRobot);
 
         // FIXME: 17.02.2023
     }
@@ -63,12 +62,11 @@ public class CommandManager {
 
     private String printHelp(String[] args) {
         return """
-                h     -> распечатать список допустимых команд (help)
-                a 1 2 -> создать робота на позиции (1, 2) (add)
-                l     -> распечатать всех роботов (list)
-                m     -> перемещаем робота на 1 единицу вперед (move)
-                cd    -> изменить направление робота (change direction)
-                q     -> завершить программу (quit)
+                h                  -> распечатать список допустимых команд (help)
+                a 1 2              -> создать робота на позиции (1, 2) (add)
+                l                  -> распечатать всех роботов (list)
+                m index [t] [5]    -> перемещаем робота на заданное количество единиц и направление (move)
+                q                  -> завершить программу (quit)
                 """;
     }
 
@@ -82,31 +80,32 @@ public class CommandManager {
 
     }
 
-    private String moveRobot(String[] args) throws CommandExecutionException{
-        if (map.getRobots().size() == 0)
-            throw new CommandExecutionException("Не создано не одного робота");
-        System.out.println(map.getRobots());
+    private String moveRobot(String[] args) throws CommandExecutionException {
+        if (args.length > 3 || args.length < 2)
+            throw new CommandExecutionException("Недостаточно аргументов");
 
-        return null;
-    }
-
-    private String changeDirectionRobot(String[] args) throws CommandExecutionException {
-        Scanner sc = new Scanner(System.in);
         if (map.getRobots().size() == 0)
             throw new CommandExecutionException("Не создано не одного робота");
 
-        System.out.println(map.getRobots());
-        System.out.println("Выберете робота введя номер его позиции");
-        int index = sc.nextInt() - 1;
-        System.out.println("Выберете, куда повернуться роботу");
-        String str = sc.nextLine();
-        sc.close();
-
-
-        return null;
+        int index = Integer.parseInt(args[0]) - 1;
+        Direction direction = Direction.valueOf(args[1]);
+        RobotMap.Robot robot = map.getRobots().get(index);
+        robot.changeDirection(direction);
+        if (args.length == 2) {
+            try {
+                robot.move();
+            } catch (RobotMoveException e) {
+                System.err.println(e.getMessage());
+            }
+        } else {
+            int step = Integer.parseInt(args[2]);
+            try {
+                robot.move(step);
+            } catch (RobotMoveException e) {
+                System.err.println(e.getMessage());
+            }
+        } return "Теперь другие координаты у " + robot;
     }
-
-
 
     private void homework() {
         // Доделать остальные команды move, change direction

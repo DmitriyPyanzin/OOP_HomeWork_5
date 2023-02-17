@@ -61,6 +61,24 @@ public class RobotMap {
             this.direction = DEFAULT_DIRECTION;
         }
 
+        public void move(int step) throws RobotMoveException {
+            final MapPoint newPoint;
+            try {
+                newPoint = switch (direction) {
+                    case TOP -> new MapPoint(point.getX() - step, point.getY());
+                    case RIGHT -> new MapPoint(point.getX(), point.getY() + step);
+                    case BOTTOM -> new MapPoint(point.getX() + step, point.getY());
+                    case LEFT -> new MapPoint(point.getX(), point.getY() - step);
+                };
+
+                validatePoint(newPoint);
+            } catch (PointValidationException e) {
+                throw new RobotMoveException(e.getMessage(), this);
+            }
+
+            this.point = newPoint;
+        }
+
         public void move() throws RobotMoveException {
             final MapPoint newPoint;
             try {
@@ -79,6 +97,7 @@ public class RobotMap {
             this.point = newPoint;
         }
 
+
         public void changeDirection(Direction direction) {
             this.direction = direction;
 
@@ -87,10 +106,6 @@ public class RobotMap {
         public MapPoint getPoint() {
             return point;
 
-        }
-
-        public String idToString() {
-            return "" + id;
         }
 
         @Override
