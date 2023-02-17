@@ -58,9 +58,9 @@ public class Main {
                     System.out.println(commandExecutionResult);
                 }
             } catch (CommandNotFoundException e) {
-                System.err.println("Команда [" + e.getMessage() + "] не найдена");
+                System.err.println("Команда [" + e.getMessage() + "] не найдена" + "\n");
             } catch (CommandExecutionException e) {
-                System.err.println("Время исполнения команды произошла ошибка " + e.getMessage());
+                System.err.println("Во время исполнения команды произошла ошибка: " + e.getMessage() + "\n");
             }
         }
     }

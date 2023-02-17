@@ -16,7 +16,6 @@ public class CommandManager {
         commands.put("l", this::listRobots);
         commands.put("m", this::moveRobot);
 
-        // FIXME: 17.02.2023
     }
 
     public String handleCommand(String command) throws CommandNotFoundException, CommandExecutionException {
@@ -46,7 +45,7 @@ public class CommandManager {
             throw new CommandExecutionException(e.getMessage());
         }
 
-        return "Робот " + map.getRobots().get(map.getRobots().size() - 1) + " добавлен";
+        return "Робот " + map.getRobots().get(map.getRobots().size() - 1) + " добавлен" + "\n";
     }
 
     private String listRobots(String[] args) throws CommandExecutionException {
@@ -57,11 +56,12 @@ public class CommandManager {
         for (int i = 0; i < map.getRobots().size(); i++) {
             str.append(map.getRobots().get(i)).append("\n");
         }
-        return str.toString();
+        return str + "\n";
     }
 
     private String printHelp(String[] args) {
         return """
+                
                 h                  -> распечатать список допустимых команд (help)
                 a 1 2              -> создать робота на позиции (1, 2) (add)
                 l                  -> распечатать всех роботов (list)
@@ -72,7 +72,7 @@ public class CommandManager {
 
     private String quit(String[] args) {
         System.exit(0);
-        return "До встречи!";
+        return null;
     }
 
     private interface CommandExecutor {
@@ -113,9 +113,5 @@ public class CommandManager {
                 System.err.println(e.getMessage());
             }
         } return "Теперь другие координаты у " + robot;
-    }
-
-    private void homework() {
-        // Доделать остальные команды move, change direction
     }
 }
